@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../lib/api'
-import { createEcho } from '../lib/echo'
+// import { createEcho } from '../lib/echo'  // Désactivé temporairement
 import useAuthStore from '../stores/authStore'
 import type { Message } from '../types'
 
@@ -13,7 +13,7 @@ export default function MessagingPage() {
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
-  const echoRef = useRef<ReturnType<typeof createEcho> | null>(null)
+  // const echoRef = useRef<ReturnType<typeof createEcho> | null>(null)  // Désactivé temporairement
   const ADMIN_ID = 1
 
   useEffect(() => {
@@ -26,16 +26,6 @@ export default function MessagingPage() {
 
   useEffect(() => {
     // Désactivé temporairement - Railway ne supporte pas les WebSockets
-    return
-    
-    if (!token || !user) return
-    const echo = createEcho(token)
-    echoRef.current = echo
-    echo.private(`chat.${user.id}`).listen('NewMessage', (e: { message: Message }) => {
-      setMessages(prev => [...prev, e.message])
-      api.patch(`/messages/${e.message.id}/read`).catch(() => {})
-    })
-    return () => { echo.leave(`chat.${user.id}`); echo.disconnect() }
   }, [token, user])
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])

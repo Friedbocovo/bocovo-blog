@@ -4,7 +4,7 @@ import useAuthStore from '../../stores/authStore'
 import useNotificationStore from '../../stores/notificationStore'
 import Avatar from '../shared/Avatar'
 import api from '../../lib/api'
-import { createEcho } from '../../lib/echo'
+// import { createEcho } from '../../lib/echo'  // Désactivé temporairement
 import type { Notification } from '../../types'
 
 const S = {
@@ -78,14 +78,9 @@ export default function Navbar() {
       setNotifications(d)
     }).catch(() => {})
   }, [token, setNotifications])
+  
   useEffect(() => {
     // Désactivé temporairement - Railway ne supporte pas les WebSockets
-    return
-    
-    if (!token || !user) return
-    const echo = createEcho(token)
-    echo.private(`user.${user.id}`).listen('NewNotification', (e: { notification: Notification }) => addNotification(e.notification))
-    return () => { echo.leave(`user.${user.id}`); echo.disconnect() }
   }, [token, user, addNotification])
 
   const handleLogout = async () => {

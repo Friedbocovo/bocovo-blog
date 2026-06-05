@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { createEcho } from '../lib/echo'
+// import { createEcho } from '../lib/echo'  // Désactivé temporairement
 import useAuthStore from '../stores/authStore'
 
 /**
@@ -14,24 +14,5 @@ export function usePresence(onPostUpdated?: () => void) {
 
   useEffect(() => {
     // Désactivé temporairement - Railway ne supporte pas les WebSockets
-    return
-    
-    if (!token) return
-
-    const echo = createEcho(token)
-
-    echo
-      .join('online')
-      .here(() => {})
-      .joining(() => {})
-      .leaving(() => {})
-      .listen('PostUpdated', () => {
-        onPostUpdated?.()
-      })
-
-    return () => {
-      echo.leave('online')
-      echo.disconnect()
-    }
   }, [token, onPostUpdated])
 }
