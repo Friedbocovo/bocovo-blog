@@ -29,7 +29,7 @@ function createEcho(token: string | null = null): Echo<'reverb'> {
     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'http') === 'https',
     enabledTransports: ['ws', 'wss'],
     // Authentification des canaux privés/présence via l'API Laravel
-    authEndpoint: 'http://localhost:8080/broadcasting/auth',
+    authEndpoint: `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:8080'}/broadcasting/auth`,
     auth: {
       headers: token
         ? { Authorization: `Bearer ${token}` }

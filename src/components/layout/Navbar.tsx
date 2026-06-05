@@ -79,6 +79,9 @@ export default function Navbar() {
     }).catch(() => {})
   }, [token, setNotifications])
   useEffect(() => {
+    // Désactivé temporairement - Railway ne supporte pas les WebSockets
+    return
+    
     if (!token || !user) return
     const echo = createEcho(token)
     echo.private(`user.${user.id}`).listen('NewNotification', (e: { notification: Notification }) => addNotification(e.notification))

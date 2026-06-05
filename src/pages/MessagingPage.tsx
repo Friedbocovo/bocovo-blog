@@ -25,6 +25,9 @@ export default function MessagingPage() {
   }, [token, user])
 
   useEffect(() => {
+    // Désactivé temporairement - Railway ne supporte pas les WebSockets
+    return
+    
     if (!token || !user) return
     const echo = createEcho(token)
     echoRef.current = echo
