@@ -96,8 +96,11 @@ export default function Navbar() {
       <div style={S.inner}>
         {/* Logo */}
         <Link to="/" style={S.logo}>
-          <span style={S.dot} />
-          Bocovo Blog
+          <div style={{ padding: '1.1rem 1rem', borderBottom: '1px solid var(--c-border)', display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
+        <img src="/favicon.png" alt="Blog Logo" style={{ width: '28px', height: '28px', borderRadius: '6px', flexShrink: 0, objectFit: 'cover' }} />
+                <img src="/blog-logo.png" alt="Blog Logo" style={{ width: '100px', height: '100px', borderRadius: '6px', flexShrink: 0, objectFit: 'cover' }} />
+
+      </div>
         </Link>
 
         {/* Nav links desktop */}

@@ -1,3 +1,40 @@
+# Blog Visitor - Application Client React
+
+Application front-end pour les visiteurs du blog, construite avec React, TypeScript et Vite.
+
+## Configuration des Variables d'Environnement
+
+### Développement Local
+Créer un fichier `.env.local` avec :
+```bash
+VITE_API_URL=http://localhost:8000/api
+```
+
+### Production (Vercel)
+Configurer les variables d'environnement sur Vercel :
+```bash
+VITE_API_URL=https://blog-api-production-5c17.up.railway.app/api
+```
+
+## Installation et Démarrage
+
+```bash
+# Installation des dépendances
+npm install
+
+# Démarrage en mode développement
+npm run dev
+
+# Build pour la production
+npm run build
+```
+
+## Déploiement
+
+L'application est automatiquement déployée sur Vercel lors des commits sur la branche principale.
+
+---
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

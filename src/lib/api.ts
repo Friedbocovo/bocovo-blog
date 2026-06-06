@@ -6,7 +6,7 @@ import axios from 'axios'
  * est présent dans le localStorage (via authStore).
  */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://blog-api-production-5c17.up.railway.app/api' : 'http://localhost:8000/api'),
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
