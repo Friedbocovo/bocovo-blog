@@ -210,31 +210,77 @@ export default function PostDetailPage() {
         <div className="prose max-w-none mb-16"
           dangerouslySetInnerHTML={{ __html: post.content }} />
 
-        {/* Section commentaires */}
-        <section>
-          <h2 className="text-2xl font-bold mb-8" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
-            Commentaires
-          </h2>
-
+        {/* Section commentaires avec design amélioré */}
+        <section className="mt-20 pt-12" style={{ borderTop: '1px solid var(--border)' }}>
           {token && user ? (
-            <form onSubmit={handleCommentSubmit} className="flex gap-3 mb-10">
-              <Avatar src={user.avatar} name={user.name} size="sm" className="mt-1 flex-shrink-0" />
-              <div className="flex-1 flex gap-2">
-                <input type="text" value={commentInput} onChange={e => setCommentInput(e.target.value)}
-                  placeholder="Laissez un commentaire…"
-                  className="flex-1 text-sm rounded-xl px-4 py-3 outline-none"
-                  style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)', border: '1px solid var(--border)' }} />
-                <button type="submit" disabled={submittingComment || !commentInput.trim()}
-                  className="px-5 py-3 rounded-xl text-sm font-semibold disabled:opacity-40 transition-opacity hover:opacity-80 flex-shrink-0"
-                  style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-light))', color: 'var(--cream)' }}>
-                  {submittingComment ? '…' : 'Publier'}
-                </button>
-              </div>
-            </form>
+            <div className="mb-12">
+              <h2 className="text-xl font-semibold mb-6 flex items-center gap-2" style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)' }}>
+                💭 Partagez votre avis
+              </h2>
+              <form onSubmit={handleCommentSubmit} className="bg-gradient-to-br from-blue-50/5 to-purple-50/5 rounded-2xl p-6 border" style={{ borderColor: 'var(--border)' }}>
+                <div className="flex gap-4">
+                  <Avatar src={user.avatar} name={user.name} size="sm" className="flex-shrink-0 mt-1" />
+                  <div className="flex-1 space-y-4">
+                    <textarea 
+                      value={commentInput} 
+                      onChange={e => setCommentInput(e.target.value)}
+                      placeholder="Qu'avez-vous pensé de cet article ? Partagez votre opinion..."
+                      className="w-full text-sm rounded-2xl px-4 py-4 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all resize-none"
+                      style={{ 
+                        backgroundColor: 'var(--bg-primary)', 
+                        color: 'var(--text-primary)', 
+                        border: '1px solid var(--border)',
+                        minHeight: '100px'
+                      }} 
+                      rows={3}
+                    />
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                        💡 Astuce: Utilisez @nom pour mentionner d'autres utilisateurs
+                      </span>
+                      <button 
+                        type="submit" 
+                        disabled={submittingComment || !commentInput.trim()}
+                        className="px-6 py-3 rounded-xl text-sm font-semibold disabled:opacity-40 transition-all hover:scale-105 disabled:hover:scale-100 flex items-center gap-2"
+                        style={{ 
+                          background: 'linear-gradient(135deg, var(--accent), var(--accent-light))', 
+                          color: 'white',
+                          boxShadow: '0 4px 12px rgba(18,118,158,0.25)'
+                        }}
+                      >
+                        {submittingComment ? (
+                          <>
+                            <span className="animate-spin">⏳</span>
+                            Publication...
+                          </>
+                        ) : (
+                          <>
+                            <span>📝</span>
+                            Publier
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
           ) : (
-            <div className="rounded-xl p-4 mb-8 text-sm text-center" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
-              <Link to={`/login?from=/posts/${slug}`} style={{ color: 'var(--accent-light)' }} className="font-medium">Connectez-vous</Link>
-              {' '}pour laisser un commentaire.
+            <div className="mb-12 text-center">
+              <div className="inline-flex items-center gap-4 rounded-2xl p-6 border border-dashed" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--accent)' }}>
+                <div className="text-2xl">🔐</div>
+                <div>
+                  <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>
+                    Rejoignez la conversation !
+                  </p>
+                  <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    <Link to={`/login?from=/posts/${slug}`} style={{ color: 'var(--accent-light)' }} className="font-medium hover:underline">
+                      Connectez-vous
+                    </Link>
+                    {' '}pour laisser un commentaire et interagir avec la communauté.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 

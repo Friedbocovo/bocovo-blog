@@ -109,101 +109,191 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* ═══ HERO SECTION PRESENTATION ═══ */}
+      {/* ═══ HERO SECTION REDESIGNÉE ═══ */}
       <section style={{
-        background: 'linear-gradient(135deg, var(--c-surface) 0%, var(--c-surface2) 100%)',
+        background: 'radial-gradient(circle at 20% 80%, rgba(18,118,158,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(26,155,196,0.1) 0%, transparent 50%), linear-gradient(135deg, var(--c-surface) 0%, var(--c-surface2) 100%)',
         borderBottom: '1px solid var(--c-border)',
-        padding: 'clamp(3rem, 8vw, 5rem) 0',
+        padding: 'clamp(4rem, 10vw, 6rem) 0',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 1.25rem' }}>
+        {/* Éléments décoratifs flottants */}
+        <div style={{
+          position: 'absolute',
+          top: '20%',
+          right: '10%',
+          width: '300px',
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(18,118,158,0.08) 0%, transparent 70%)',
+          borderRadius: '50%',
+          animation: 'float 6s ease-in-out infinite'
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '10%',
+          left: '5%',
+          width: '200px',
+          height: '200px',
+          background: 'radial-gradient(circle, rgba(26,155,196,0.05) 0%, transparent 70%)',
+          borderRadius: '50%',
+          animation: 'float 4s ease-in-out infinite reverse'
+        }} />
+        
+        <div style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto', 
+          padding: '0 2rem',
+          position: 'relative',
+          zIndex: 1
+        }}>
           <div style={{ 
-            display: 'flex', 
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : 'auto 1fr',
             alignItems: 'center', 
-            gap: 'clamp(2rem, 5vw, 4rem)',
-            flexDirection: isMobile ? 'column' : 'row',
+            gap: 'clamp(3rem, 6vw, 5rem)',
             textAlign: isMobile ? 'center' : 'left'
           }}>
-            {/* Photo de profil */}
+            {/* Avatar amélioré avec animation */}
             <div style={{
-              width: 'clamp(120px, 20vw, 180px)',
-              height: 'clamp(120px, 20vw, 180px)',
-              borderRadius: '50%',
-              background: 'var(--c-cyan)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-              fontWeight: 'bold',
-              color: 'var(--c-cream)',
-              flexShrink: 0,
-              boxShadow: '0 8px 32px rgba(26, 155, 196, 0.3)',
-              border: '4px solid var(--c-surface)',
-              overflow: 'hidden'
+              position: 'relative',
+              justifySelf: isMobile ? 'center' : 'start'
             }}>
-              <img 
-                src="/favicon.png" 
-                alt="Bocovo" 
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                  (e.target as HTMLImageElement).parentElement!.innerHTML = 'BC';
-                }}
-              />
+              <div style={{
+                width: 'clamp(140px, 22vw, 200px)',
+                height: 'clamp(140px, 22vw, 200px)',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, var(--c-cyan), var(--c-cyan-dim))',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+                fontWeight: 'bold',
+                color: 'var(--c-cream)',
+                flexShrink: 0,
+                boxShadow: '0 20px 40px rgba(26, 155, 196, 0.3), 0 0 0 8px rgba(18,118,158,0.1)',
+                border: '6px solid var(--c-surface)',
+                overflow: 'hidden',
+                transition: 'all 0.3s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.transform = 'scale(1.05) rotate(2deg)';
+                (e.currentTarget as HTMLElement).style.boxShadow = '0 25px 50px rgba(26, 155, 196, 0.4), 0 0 0 12px rgba(18,118,158,0.15)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.transform = 'scale(1) rotate(0deg)';
+                (e.currentTarget as HTMLElement).style.boxShadow = '0 20px 40px rgba(26, 155, 196, 0.3), 0 0 0 8px rgba(18,118,158,0.1)';
+              }}
+              >
+                <img 
+                  src="/favicon.png" 
+                  alt="Bocovo" 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                    (e.target as HTMLImageElement).parentElement!.innerHTML = 'BC';
+                  }}
+                />
+              </div>
+              
+              {/* Badge flottant */}
+              <div style={{
+                position: 'absolute',
+                bottom: '10px',
+                right: '10px',
+                background: 'linear-gradient(135deg, #10B981, #059669)',
+                color: 'white',
+                padding: '4px 8px',
+                borderRadius: '12px',
+                fontSize: '0.7rem',
+                fontWeight: '600',
+                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                <span>🟢</span>
+                Actif
+              </div>
             </div>
 
-            {/* Contenu */}
+            {/* Contenu texte redesigné */}
             <div style={{ flex: 1 }}>
-              <div style={{ marginBottom: '0.75rem' }}>
+              {/* Tag d'introduction */}
+              <div style={{ marginBottom: '1.5rem' }}>
                 <span style={{
-                  display: 'inline-block',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '0.8rem',
+                  fontWeight: '700',
                   color: 'var(--c-cyan)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
-                  marginBottom: '0.5rem'
+                  padding: '8px 16px',
+                  background: 'rgba(18,118,158,0.1)',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(18,118,158,0.2)'
                 }}>
-                  Bienvenue sur mon blog
+                  <span>✨</span>
+                  Bienvenue sur mon univers
                 </span>
-                <h1 style={{
-                  fontFamily: 'var(--font-head)',
-                  fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
-                  fontWeight: 'bold',
-                  color: 'var(--c-text)',
-                  lineHeight: 1.2,
-                  marginBottom: '1rem'
-                }}>
-                  Salut, moi c'est <span style={{ color: 'var(--c-cyan)' }}>Bocovo</span> 👋
-                </h1>
               </div>
 
-              <div style={{ marginBottom: '1.5rem' }}>
+              {/* Titre principal avec effet */}
+              <h1 style={{
+                fontFamily: 'var(--font-head)',
+                fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
+                fontWeight: '900',
+                color: 'var(--c-text)',
+                lineHeight: 1.1,
+                marginBottom: '1.5rem',
+                background: 'linear-gradient(135deg, var(--c-text) 0%, var(--c-cyan) 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+                Salut, moi c'est{' '}
+                <span style={{
+                  background: 'linear-gradient(135deg, var(--c-cyan), var(--c-cyan-dim))',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  position: 'relative'
+                }}>
+                  Bocovo
+                </span>
+                {' '}👋
+              </h1>
+
+              {/* Description avec typographie améliorée */}
+              <div style={{ marginBottom: '2.5rem', maxWidth: '600px' }}>
+                <p style={{
+                  fontSize: 'clamp(1rem, 2.2vw, 1.2rem)',
+                  color: 'var(--c-sub)',
+                  lineHeight: 1.7,
+                  marginBottom: '1.5rem',
+                  fontWeight: '400'
+                }}>
+                  <strong style={{ color: 'var(--c-text)' }}>Développeur passionné</strong>, je partage mes découvertes, mes projets et mes réflexions sur le monde du développement web, les nouvelles technologies et l'innovation numérique.
+                </p>
                 <p style={{
                   fontSize: 'clamp(0.95rem, 2vw, 1.1rem)',
-                  color: 'var(--c-sub)',
-                  lineHeight: 1.6,
-                  marginBottom: '1rem'
-                }}>
-                  Développeur passionné, je partage mes découvertes, mes projets et mes réflexions sur le monde du développement web, 
-                  les nouvelles technologies et l'innovation numérique.
-                </p>
-                <p style={{
-                  fontSize: 'clamp(0.9rem, 1.8vw, 1rem)',
                   color: 'var(--c-muted)',
-                  lineHeight: 1.5
+                  lineHeight: 1.6
                 }}>
-                  Ici, vous trouverez des tutoriels, des analyses techniques, des retours d'expérience et des astuces 
-                  pour améliorer vos compétences de développeur. Rejoignez-moi dans cette aventure !
+                  Ici, vous trouverez des <em style={{ color: 'var(--c-sub)' }}>tutoriels</em>, des <em style={{ color: 'var(--c-sub)' }}>analyses techniques</em>, des retours d'expérience et des astuces pour améliorer vos compétences de développeur. Rejoignez-moi dans cette aventure !
                 </p>
               </div>
 
+              {/* Actions redesignées */}
               <div style={{ 
                 display: 'flex', 
-                gap: '1rem', 
+                gap: '1.5rem', 
                 alignItems: 'center',
                 justifyContent: isMobile ? 'center' : 'flex-start',
                 flexWrap: 'wrap'
@@ -211,43 +301,78 @@ export default function HomePage() {
                 <button
                   onClick={() => navigate('/about')}
                   style={{
-                    padding: '0.75rem 2rem',
-                    borderRadius: '8px',
-                    fontSize: '0.9rem',
+                    padding: '1rem 2.5rem',
+                    borderRadius: '12px',
+                    fontSize: '0.95rem',
                     fontWeight: '600',
-                    background: 'var(--c-cyan)',
+                    background: 'linear-gradient(135deg, var(--c-cyan), var(--c-cyan-dim))',
                     color: 'var(--c-cream)',
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    boxShadow: '0 2px 8px rgba(26, 155, 196, 0.3)'
+                    transition: 'all 0.3s',
+                    boxShadow: '0 8px 25px rgba(26, 155, 196, 0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.background = 'var(--c-cyan-dim)';
-                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px) scale(1.02)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 35px rgba(26, 155, 196, 0.5), inset 0 1px 0 rgba(255,255,255,0.1)';
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.background = 'var(--c-cyan)';
-                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0) scale(1)';
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 25px rgba(26, 155, 196, 0.4), inset 0 1px 0 rgba(255,255,255,0.1)';
                   }}
                 >
-                  En savoir plus
+                  🚀 Découvrir mon parcours
                 </button>
                 
+                {/* Stats améliorées */}
                 <div style={{ 
                   display: 'flex', 
                   alignItems: 'center', 
-                  gap: '0.5rem',
-                  fontSize: '0.85rem',
+                  gap: '1rem',
+                  fontSize: '0.9rem',
                   color: 'var(--c-muted)'
                 }}>
-                  <span>📚</span>
-                  <span>{posts.length + (featuredPost ? 1 : 0)} articles publiés</span>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '20px',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    <span style={{ fontSize: '1.1em' }}>📚</span>
+                    <span style={{ fontWeight: '600' }}>{posts.length + (featuredPost ? 1 : 0)}</span>
+                    <span>articles</span>
+                  </div>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '20px',
+                    border: '1px solid rgba(255,255,255,0.1)'
+                  }}>
+                    <span style={{ fontSize: '1.1em' }}>💡</span>
+                    <span style={{ fontWeight: '600' }}>Tech</span>
+                    <span>& Innovation</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Animation CSS intégrée */}
+        <style>{`
+          @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+          }
+        `}</style>
       </section>
       {/* ═══ FEATURED HERO ═══ */}
       {featuredPost && !loading && (
