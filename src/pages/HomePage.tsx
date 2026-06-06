@@ -380,8 +380,8 @@ export default function HomePage() {
           }
         `}</style>
       </section>
-      {/* ═══ FEATURED ARTICLE CARD (only for non-authenticated users) ═══ */}
-      {featuredPost && !loading && !user && (
+      {/* ═══ FEATURED ARTICLE CARD ═══ */}
+      {featuredPost && !loading && (
         <section style={{
           maxWidth: '1100px',
           margin: '2rem auto',
