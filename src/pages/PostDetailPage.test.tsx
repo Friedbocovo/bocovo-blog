@@ -41,11 +41,10 @@ const mockNavigate = vi.fn()
 const mockUseParams = vi.fn()
 
 // Configuration du mock react-router-dom
-vi.mocked = vi.fn()
-Object.assign(vi.mock('react-router-dom'), {
-  useParams: mockUseParams,
+vi.mock('react-router-dom', () => ({
+  useParams: () => mockUseParams(),
   useNavigate: () => mockNavigate,
-})
+}))
 
 const mockApi = vi.mocked(api)
 
