@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import api from '../lib/api'
 import type { Post, Tag, PaginatedResponse } from '../types'
 import { usePresence } from '../hooks/usePresence'
+import useAuthStore from '../stores/authStore'
 
 const FALLBACK_IMG = 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80&auto=format&fit=crop'
 
@@ -63,6 +64,7 @@ function PostGrid({ post }: { post: Post }) {
 export default function HomePage() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const { user } = useAuthStore()
   const [posts, setPosts] = useState<Post[]>([])
   const [featuredPost, setFeaturedPost] = useState<Post | null>(null)
   const [tags, setTags] = useState<Tag[]>([])
@@ -112,8 +114,7 @@ export default function HomePage() {
       {/* ═══ HERO SECTION REDESIGNÉE ═══ */}
       <section style={{
         background: 'radial-gradient(circle at 20% 80%, rgba(18,118,158,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(26,155,196,0.1) 0%, transparent 50%), linear-gradient(135deg, var(--c-surface) 0%, var(--c-surface2) 100%)',
-        borderBottom: '1px solid var(--c-border)',
-        padding: 'clamp(4rem, 10vw, 6rem) 0',
+        padding: 'clamp(4rem, 10vw, 6rem) 2rem',
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -139,12 +140,17 @@ export default function HomePage() {
           animation: 'float 4s ease-in-out infinite reverse'
         }} />
         
+        {/* Container avec largeur limitée et bordures arrondies */}
         <div style={{ 
           maxWidth: '1200px', 
-          margin: '0 auto', 
-          padding: '0 2rem',
+          margin: '0 auto',
+          background: 'rgba(255, 255, 255, 0.02)',
+          borderRadius: '32px',
+          border: '1px solid var(--c-border)',
+          padding: 'clamp(2rem, 5vw, 4rem)',
           position: 'relative',
-          zIndex: 1
+          zIndex: 1,
+          backdropFilter: 'blur(10px)'
         }}>
           <div style={{ 
             display: 'grid',
@@ -374,48 +380,213 @@ export default function HomePage() {
           }
         `}</style>
       </section>
-      {/* ═══ FEATURED HERO ═══ */}
-      {featuredPost && !loading && (
-        <section
-          onClick={() => navigate(`/posts/${featuredPost.slug}`)}
-          style={{
-            position: 'relative', cursor: 'pointer',
-            height: 'clamp(300px, 55vw, 600px)',
-            overflow: 'hidden',
-          }}
-        >
-          <img
-            src={featuredPost.cover_image ?? FALLBACK_IMG}
-            onError={e => { (e.target as HTMLImageElement).src = FALLBACK_IMG }}
-            alt={featuredPost.title}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          />
-          {/* Gradient overlay */}
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(5,8,20,0.95) 0%, rgba(5,8,20,0.5) 50%, rgba(5,8,20,0.1) 100%)' }} />
+      {/* ═══ FEATURED ARTICLE CARD (only for non-authenticated users) ═══ */}
+      {featuredPost && !loading && !user && (
+        <section style={{
+          maxWidth: '1100px',
+          margin: '2rem auto',
+          padding: '0 1.25rem'
+        }}>
+          <div
+            onClick={() => navigate(`/posts/${featuredPost.slug}`)}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : '380px 1fr',
+              gap: isMobile ? '0' : '2rem',
+              background: 'var(--c-surface)',
+              borderRadius: '16px',
+              overflow: 'hidden',
+              border: '1px solid var(--c-border)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+              cursor: 'pointer',
+              transition: 'transform 0.3s, box-shadow 0.3s'
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)';
+              (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 40px rgba(26, 155, 196, 0.3)';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+              (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
+            }}
+          >
+            {/* Image à gauche */}
+            <div style={{
+              position: 'relative',
+              height: isMobile ? '240px' : '100%',
+              minHeight: isMobile ? '240px' : '280px',
+              overflow: 'hidden'
+            }}>
+              <img
+                src={featuredPost.cover_image ?? FALLBACK_IMG}
+                onError={e => { (e.target as HTMLImageElement).src = FALLBACK_IMG }}
+                alt={featuredPost.title}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  transition: 'transform 0.5s'
+                }}
+              />
+              {/* Badge "À la une" */}
+              <div style={{
+                position: 'absolute',
+                top: '1rem',
+                left: '1rem',
+                background: 'linear-gradient(135deg, var(--c-cyan), var(--c-cyan-dim))',
+                color: '#fff',
+                padding: '0.4rem 0.85rem',
+                borderRadius: '20px',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                boxShadow: '0 4px 12px rgba(18, 118, 158, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem'
+              }}>
+                <span>✨</span> À la une
+              </div>
+            </div>
 
-          {/* Contenu */}
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 'clamp(1.5rem, 4vw, 3rem)' }}>
-            <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-              <span style={{ display: 'inline-block', fontSize: '0.7rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: '3px', background: 'var(--c-cyan-dim)', color: '#fff', marginBottom: '0.75rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                À la une
-              </span>
-              <h1 style={{ fontFamily: 'var(--font-head)', fontSize: 'clamp(1.4rem, 3.5vw, 2.4rem)', color: '#fff', lineHeight: 1.25, marginBottom: '0.75rem', maxWidth: '680px' }}>
+            {/* Contenu à droite */}
+            <div style={{
+              padding: isMobile ? '1.5rem' : '2rem 2rem 2rem 0',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center'
+            }}>
+              {/* Tags */}
+              {featuredPost.tags && featuredPost.tags.length > 0 && (
+                <div style={{
+                  display: 'flex',
+                  gap: '0.5rem',
+                  marginBottom: '1rem',
+                  flexWrap: 'wrap'
+                }}>
+                  {featuredPost.tags.slice(0, 3).map(t => (
+                    <span key={t.id} style={{
+                      fontSize: '0.7rem',
+                      color: 'var(--c-cyan)',
+                      padding: '0.25rem 0.65rem',
+                      borderRadius: '6px',
+                      background: 'rgba(26,155,196,0.1)',
+                      border: '1px solid rgba(26,155,196,0.2)',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em'
+                    }}>
+                      {t.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Titre */}
+              <h2 style={{
+                fontFamily: 'var(--font-head)',
+                fontSize: isMobile ? '1.5rem' : '2rem',
+                color: 'var(--c-text)',
+                lineHeight: 1.3,
+                marginBottom: '1rem',
+                fontWeight: 800
+              }}>
                 {featuredPost.title}
-              </h1>
+              </h2>
+
+              {/* Extrait */}
               {featuredPost.excerpt && (
-                <p style={{ fontSize: 'clamp(0.8rem, 1.5vw, 0.95rem)', color: 'rgba(255,255,255,0.75)', maxWidth: '560px', lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                <p style={{
+                  fontSize: '0.95rem',
+                  color: 'var(--c-sub)',
+                  lineHeight: 1.7,
+                  marginBottom: '1.5rem',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden'
+                }}>
                   {featuredPost.excerpt}
                 </p>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.75rem' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--c-cyan-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, color: '#fff' }}>
-                  {(featuredPost.user?.name ?? 'A')[0].toUpperCase()}
+
+              {/* Métadonnées et CTA */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                marginTop: 'auto'
+              }}>
+                {/* Auteur et date */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem'
+                }}>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, var(--c-cyan), var(--c-cyan-dim))',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    color: '#fff',
+                    boxShadow: '0 4px 12px rgba(26, 155, 196, 0.3)'
+                  }}>
+                    {(featuredPost.user?.name ?? 'A')[0].toUpperCase()}
+                  </div>
+                  <div>
+                    <p style={{
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      color: 'var(--c-text)',
+                      marginBottom: '0.15rem'
+                    }}>
+                      {featuredPost.user?.name ?? 'Auteur'}
+                    </p>
+                    <p style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--c-muted)'
+                    }}>
+                      {featuredPost.published_at ? fmtDate(featuredPost.published_at) : fmtDate(featuredPost.created_at)}
+                    </p>
+                  </div>
                 </div>
-                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)' }}>{featuredPost.user?.name ?? 'Auteur'}</span>
-                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>·</span>
-                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.7)' }}>
-                  {featuredPost.published_at ? fmtDate(featuredPost.published_at) : fmtDate(featuredPost.created_at)}
-                </span>
+
+                {/* Bouton CTA */}
+                <button
+                  style={{
+                    padding: '0.65rem 1.5rem',
+                    borderRadius: '8px',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    background: 'var(--c-cyan-dim)',
+                    color: '#fff',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    transition: 'all 0.2s',
+                    boxShadow: '0 4px 12px rgba(26, 155, 196, 0.3)'
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'var(--c-cyan)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateX(4px)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'var(--c-cyan-dim)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateX(0)';
+                  }}
+                >
+                  Lire l'article
+                  <span style={{ fontSize: '1.1em' }}>→</span>
+                </button>
               </div>
             </div>
           </div>

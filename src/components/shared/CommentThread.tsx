@@ -126,7 +126,7 @@ function CommentItem({ comment, onReply, onDelete, depth }: CommentItemProps) {
 
           {/* Actions avec design amélioré */}
           <div className="flex items-center gap-4 mt-2 px-2">
-            {user && depth < 3 && (
+            {user && (
               <button
                 onClick={() => {
                   insertMention(comment.user?.name ?? '')

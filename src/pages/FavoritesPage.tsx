@@ -10,9 +10,12 @@ export default function FavoritesPage() {
   const fetchFavorites = async () => {
     setLoading(true)
     try {
-      const res = await api.get<Post[]>('/user/favorites')
-      setPosts(Array.isArray(res.data) ? res.data : [])
+      const res = await api.get('/user/favorites')
+      // L'API renvoie { data: Post[] } avec pagination
+      const favoritesData = res.data.data || res.data
+      setPosts(Array.isArray(favoritesData) ? favoritesData : [])
     } catch (error) {
+      console.error('Error fetching favorites:', error)
       setPosts([])
     } finally {
       setLoading(false)
