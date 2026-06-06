@@ -36,30 +36,31 @@ export default function PostDetailPage() {
       api.get<Comment[]>(`/posts/${slug}/comments`)
     ])
       .then(([pr, cr]) => {
-        setPost(pr.data)
-        setLikesCount(pr.data.likes_count ?? 0)
-        setComments(Array.isArray(cr.data) ? cr.data : [])
+        // L'API renvoie directement le Post pour les posts individuels
+        const postData = pr.data
+        setPost(postData)
+        setLikesCount(postData.likes_count ?? 0)
+        
+        // Les commentaires sont directement dans cr.data
+        const commentsData = Array.isArray(cr.data) ? cr.data : (cr.data as any).data || []
+        setComments(commentsData)
         
         // Initialiser avec valeurs par défaut
-        setLiked(pr.data.id, false)
-        setFavorited(pr.data.id, false)
+        setLiked(postData.id, false)
+        setFavorited(postData.id, false)
         
         setLoading(false)
         
         // Étape 2: Charger les données optionnelles (status) avec gestion d'erreur isolée
-        // Amélioration de la condition du token pour éviter les requêtes inutiles
         if (token && user) {
           api.get<{ liked: boolean; favorited: boolean }>(`/posts/${slug}/status`)
             .then((sr) => {
               // Mettre à jour avec les statuts réels si disponibles
-              setLiked(pr.data.id, sr.data.liked)
-              setFavorited(pr.data.id, sr.data.favorited)
+              setLiked(postData.id, sr.data.liked)
+              setFavorited(postData.id, sr.data.favorited)
             })
             .catch((error) => {
-              // Gestion d'erreur isolée pour status - continuer avec valeurs par défaut
               console.warn('Status endpoint failed, using default values:', error.response?.status)
-              // Les valeurs par défaut sont déjà définies ci-dessus
-              // L'affichage de l'article continue normalement
             })
         }
       })
