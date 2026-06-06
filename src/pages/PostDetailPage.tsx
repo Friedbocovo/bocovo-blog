@@ -29,21 +29,45 @@ export default function PostDetailPage() {
   useEffect(() => {
     if (!slug) return
     setLoading(true)
+    
+    // Étape 1: Charger les données critiques (article + commentaires)
     Promise.all([
       api.get<Post>(`/posts/${slug}`),
-      api.get<Comment[]>(`/posts/${slug}/comments`),
-      token ? api.get<{ liked: boolean; favorited: boolean }>(`/posts/${slug}/status`) : Promise.resolve({ data: { liked: false, favorited: false } })
+      api.get<Comment[]>(`/posts/${slug}/comments`)
     ])
-      .then(([pr, cr, sr]) => {
+      .then(([pr, cr]) => {
         setPost(pr.data)
         setLikesCount(pr.data.likes_count ?? 0)
         setComments(Array.isArray(cr.data) ? cr.data : [])
-        // Mettre à jour le store global avec les statuts réels
-        setLiked(pr.data.id, sr.data.liked)
-        setFavorited(pr.data.id, sr.data.favorited)
+        
+        // Initialiser avec valeurs par défaut
+        setLiked(pr.data.id, false)
+        setFavorited(pr.data.id, false)
+        
+        setLoading(false)
+        
+        // Étape 2: Charger les données optionnelles (status) avec gestion d'erreur isolée
+        // Amélioration de la condition du token pour éviter les requêtes inutiles
+        if (token && user) {
+          api.get<{ liked: boolean; favorited: boolean }>(`/posts/${slug}/status`)
+            .then((sr) => {
+              // Mettre à jour avec les statuts réels si disponibles
+              setLiked(pr.data.id, sr.data.liked)
+              setFavorited(pr.data.id, sr.data.favorited)
+            })
+            .catch((error) => {
+              // Gestion d'erreur isolée pour status - continuer avec valeurs par défaut
+              console.warn('Status endpoint failed, using default values:', error.response?.status)
+              // Les valeurs par défaut sont déjà définies ci-dessus
+              // L'affichage de l'article continue normalement
+            })
+        }
       })
-      .catch(() => navigate('/'))
-      .finally(() => setLoading(false))
+      .catch(() => {
+        // Erreur sur article/commentaires → Redirection (comportement actuel préservé)
+        // Cela préserve le comportement existant pour les vraies erreurs d'article
+        navigate('/')
+      })
   }, [slug, navigate, token])
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
