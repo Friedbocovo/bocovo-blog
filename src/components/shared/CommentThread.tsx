@@ -43,8 +43,14 @@ function CommentItem({ comment, onReply, onDelete, depth }: CommentItemProps) {
     
     if (comment.user.role === 'admin') {
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-          ✨ Bocovo
+        <span 
+          className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold"
+          style={{
+            background: 'linear-gradient(135deg, #8B5CF6, #6366F1)',
+            color: 'white'
+          }}
+        >
+          Admin
         </span>
       )
     }
@@ -89,96 +95,83 @@ function CommentItem({ comment, onReply, onDelete, depth }: CommentItemProps) {
   }
 
   return (
-    <div className={`group ${depth > 0 ? 'ml-6 mt-4' : 'mt-6'}`}>
+    <div className={`${depth > 0 ? 'mt-4' : 'mt-6'}`}>
       <div className="flex gap-3">
         <Avatar
           src={comment.user?.avatar}
           name={comment.user?.name ?? 'Utilisateur'}
-          size={depth > 0 ? "sm" : "sm"}
+          size="sm"
           className="flex-shrink-0 mt-1"
         />
 
         <div className="flex-1 min-w-0">
           {/* Header avec nom, badge et date */}
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-1">
             <span className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
               {comment.user?.name ?? 'Utilisateur'}
             </span>
             {getRoleBadge()}
-            <span className="text-xs opacity-60" style={{ color: 'var(--text-muted)' }}>
+            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
               {formatDate(comment.created_at)}
             </span>
           </div>
 
-          {/* Contenu du commentaire avec design amélioré */}
-          <div
-            className="rounded-2xl p-4 shadow-sm border transition-all hover:shadow-md"
-            style={{ 
-              backgroundColor: depth > 0 ? 'var(--bg-secondary)' : 'var(--bg-tertiary)',
-              border: '1px solid var(--border)',
-              borderLeft: depth > 0 ? '3px solid var(--accent)' : '1px solid var(--border)'
-            }}
-          >
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              {parseContent(comment.content)}
-            </p>
-          </div>
+          {/* Contenu du commentaire */}
+          <p className="text-sm leading-relaxed mb-2" style={{ color: 'var(--text-secondary)' }}>
+            {parseContent(comment.content)}
+          </p>
 
-          {/* Actions avec design amélioré */}
-          <div className="flex items-center gap-4 mt-2 px-2">
+          {/* Actions */}
+          <div className="flex items-center gap-4 mb-3">
             {user && (
               <button
                 onClick={() => {
                   insertMention(comment.user?.name ?? '')
                   setShowReplyForm((v) => !v)
                 }}
-                className="flex items-center gap-1 text-xs font-medium transition-all hover:scale-105 opacity-0 group-hover:opacity-100"
+                className="flex items-center gap-1 text-xs font-medium transition-colors hover:opacity-80"
                 style={{ color: 'var(--accent)' }}
               >
-                <span>↩️</span>
-                Répondre
+                ↩️ Répondre
               </button>
             )}
             {canDelete && onDelete && (
               <button
                 onClick={() => onDelete(comment.id)}
-                className="flex items-center gap-1 text-xs font-medium transition-all hover:scale-105 opacity-0 group-hover:opacity-100"
+                className="flex items-center gap-1 text-xs font-medium transition-colors hover:opacity-80"
                 style={{ color: 'var(--danger)' }}
               >
-                <span>🗑️</span>
-                Supprimer
+                🗑️ Supprimer
               </button>
             )}
           </div>
 
-          {/* Formulaire de réponse amélioré */}
+          {/* Formulaire de réponse */}
           {showReplyForm && user && (
-            <div className="mt-4 p-4 rounded-xl border border-dashed" style={{ borderColor: 'var(--accent)', backgroundColor: 'rgba(18,118,158,0.05)' }}>
-              <form onSubmit={handleReplySubmit} className="space-y-3">
+            <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)' }}>
+              <form onSubmit={handleReplySubmit} className="space-y-2">
                 <div className="flex gap-2">
                   <Avatar src={user.avatar} name={user.name} size="sm" className="mt-1 flex-shrink-0" />
-                  <div className="flex-1">
-                    <textarea
-                      value={replyContent}
-                      onChange={(e) => setReplyContent(e.target.value)}
-                      placeholder={`Répondre à ${comment.user?.name}... (@mentions supportées)`}
-                      className="w-full text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                      style={{
-                        backgroundColor: 'var(--bg-primary)',
-                        color: 'var(--text-primary)',
-                        border: '1px solid var(--border)',
-                        minHeight: '60px'
-                      }}
-                      autoFocus
-                      rows={2}
-                    />
-                  </div>
+                  <textarea
+                    value={replyContent}
+                    onChange={(e) => setReplyContent(e.target.value)}
+                    placeholder={`Répondre à ${comment.user?.name}...`}
+                    className="flex-1 text-sm rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    style={{
+                      backgroundColor: 'var(--bg-primary)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--border)',
+                      minHeight: '60px'
+                    }}
+                    autoFocus
+                    rows={2}
+                  />
                 </div>
                 <div className="flex gap-2 justify-end">
                   <button
                     type="button"
                     onClick={() => setShowReplyForm(false)}
-                    className="text-sm px-4 py-2 rounded-lg transition-colors"
+                    className="text-xs px-3 py-1.5 rounded-lg transition-colors"
                     style={{ color: 'var(--text-muted)' }}
                   >
                     Annuler
@@ -186,22 +179,28 @@ function CommentItem({ comment, onReply, onDelete, depth }: CommentItemProps) {
                   <button
                     type="submit"
                     disabled={submitting || !replyContent.trim()}
-                    className="text-sm px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all disabled:opacity-50"
                     style={{ 
                       background: 'linear-gradient(135deg, var(--accent), var(--accent-light))', 
                       color: 'white'
                     }}
                   >
-                    {submitting ? '⏳ Envoi...' : '📤 Répondre'}
+                    {submitting ? '⏳ Envoi...' : 'Répondre'}
                   </button>
                 </div>
               </form>
             </div>
           )}
 
-          {/* Réponses imbriquées */}
+          {/* Réponses imbriquées - DANS un conteneur gris à l'intérieur */}
           {comment.replies && comment.replies.length > 0 && (
-            <div className="mt-4">
+            <div 
+              className="mt-3 p-4 rounded-lg space-y-4"
+              style={{ 
+                backgroundColor: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.05)'
+              }}
+            >
               {comment.replies.map((reply) => (
                 <CommentItem
                   key={reply.id}
