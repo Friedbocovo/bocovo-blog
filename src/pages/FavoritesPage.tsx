@@ -7,11 +7,32 @@ export default function FavoritesPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
 
+  const fetchFavorites = async () => {
+    setLoading(true)
+    try {
+      const res = await api.get<Post[]>('/user/favorites')
+      setPosts(Array.isArray(res.data) ? res.data : [])
+    } catch (error) {
+      setPosts([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    api.get<Post[]>('/user/favorites')
-      .then(r => setPosts(Array.isArray(r.data) ? r.data : []))
-      .catch(() => setPosts([]))
-      .finally(() => setLoading(false))
+    fetchFavorites()
+  }, [])
+
+  // Rafraîchir quand on revient sur la page
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetchFavorites()
+      }
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
   }, [])
 
   return (

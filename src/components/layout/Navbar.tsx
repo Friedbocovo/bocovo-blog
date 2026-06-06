@@ -133,7 +133,20 @@ export default function Navbar() {
                       {notifications.length === 0
                         ? <p style={{ textAlign: 'center', padding: '1.25rem', fontSize: '0.8rem', color: 'var(--c-muted)' }}>Aucune notification</p>
                         : notifications.slice(0, 8).map(n => (
-                          <div key={n.id} onClick={() => { if (!n.read_at) { api.patch(`/notifications/${n.id}/read`); markRead(n.id) } }}
+                          <div key={n.id} onClick={() => { 
+                            if (!n.read_at) { 
+                              api.patch(`/notifications/${n.id}/read`); 
+                              markRead(n.id) 
+                            }
+                            // Redirection basée sur le type de notification
+                            if (n.data.post_slug) {
+                              navigate(`/posts/${n.data.post_slug}`)
+                            } else if (n.data.post_id) {
+                              // Fallback si on a l'ID mais pas le slug
+                              navigate(`/posts/${n.data.post_id}`)
+                            }
+                            setShowNotif(false)
+                          }}
                             style={{ padding: '0.625rem 1rem', borderBottom: '1px solid var(--c-border)', cursor: 'pointer', background: !n.read_at ? 'rgba(26,155,196,0.06)' : 'transparent' }}>
                             <p style={{ fontSize: '0.8rem', color: 'var(--c-text)' }}>{n.data.message}</p>
                             <p style={{ fontSize: '0.7rem', color: 'var(--c-muted)', marginTop: '2px' }}>{new Date(n.created_at).toLocaleDateString('fr-FR')}</p>

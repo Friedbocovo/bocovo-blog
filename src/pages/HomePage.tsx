@@ -69,6 +69,15 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [lastPage, setLastPage] = useState(1)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Détection mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const currentTag = searchParams.get('tag') ?? ''
   const currentSearch = searchParams.get('search') ?? ''
@@ -100,6 +109,146 @@ export default function HomePage() {
 
   return (
     <div>
+      {/* ═══ HERO SECTION PRESENTATION ═══ */}
+      <section style={{
+        background: 'linear-gradient(135deg, var(--c-surface) 0%, var(--c-surface2) 100%)',
+        borderBottom: '1px solid var(--c-border)',
+        padding: 'clamp(3rem, 8vw, 5rem) 0',
+      }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 1.25rem' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 'clamp(2rem, 5vw, 4rem)',
+            flexDirection: isMobile ? 'column' : 'row',
+            textAlign: isMobile ? 'center' : 'left'
+          }}>
+            {/* Photo de profil */}
+            <div style={{
+              width: 'clamp(120px, 20vw, 180px)',
+              height: 'clamp(120px, 20vw, 180px)',
+              borderRadius: '50%',
+              background: 'var(--c-cyan)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+              fontWeight: 'bold',
+              color: 'var(--c-cream)',
+              flexShrink: 0,
+              boxShadow: '0 8px 32px rgba(26, 155, 196, 0.3)',
+              border: '4px solid var(--c-surface)',
+              overflow: 'hidden'
+            }}>
+              <img 
+                src="/favicon.png" 
+                alt="Bocovo" 
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).parentElement!.innerHTML = 'BC';
+                }}
+              />
+            </div>
+
+            {/* Contenu */}
+            <div style={{ flex: 1 }}>
+              <div style={{ marginBottom: '0.75rem' }}>
+                <span style={{
+                  display: 'inline-block',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  color: 'var(--c-cyan)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  marginBottom: '0.5rem'
+                }}>
+                  Bienvenue sur mon blog
+                </span>
+                <h1 style={{
+                  fontFamily: 'var(--font-head)',
+                  fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+                  fontWeight: 'bold',
+                  color: 'var(--c-text)',
+                  lineHeight: 1.2,
+                  marginBottom: '1rem'
+                }}>
+                  Salut, moi c'est <span style={{ color: 'var(--c-cyan)' }}>Bocovo</span> 👋
+                </h1>
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <p style={{
+                  fontSize: 'clamp(0.95rem, 2vw, 1.1rem)',
+                  color: 'var(--c-sub)',
+                  lineHeight: 1.6,
+                  marginBottom: '1rem'
+                }}>
+                  Développeur passionné, je partage mes découvertes, mes projets et mes réflexions sur le monde du développement web, 
+                  les nouvelles technologies et l'innovation numérique.
+                </p>
+                <p style={{
+                  fontSize: 'clamp(0.9rem, 1.8vw, 1rem)',
+                  color: 'var(--c-muted)',
+                  lineHeight: 1.5
+                }}>
+                  Ici, vous trouverez des tutoriels, des analyses techniques, des retours d'expérience et des astuces 
+                  pour améliorer vos compétences de développeur. Rejoignez-moi dans cette aventure !
+                </p>
+              </div>
+
+              <div style={{ 
+                display: 'flex', 
+                gap: '1rem', 
+                alignItems: 'center',
+                justifyContent: isMobile ? 'center' : 'flex-start',
+                flexWrap: 'wrap'
+              }}>
+                <button
+                  onClick={() => navigate('/about')}
+                  style={{
+                    padding: '0.75rem 2rem',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    background: 'var(--c-cyan)',
+                    color: 'var(--c-cream)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    boxShadow: '0 2px 8px rgba(26, 155, 196, 0.3)'
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'var(--c-cyan-dim)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'var(--c-cyan)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                  }}
+                >
+                  En savoir plus
+                </button>
+                
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.5rem',
+                  fontSize: '0.85rem',
+                  color: 'var(--c-muted)'
+                }}>
+                  <span>📚</span>
+                  <span>{posts.length + (featuredPost ? 1 : 0)} articles publiés</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
       {/* ═══ FEATURED HERO ═══ */}
       {featuredPost && !loading && (
         <section

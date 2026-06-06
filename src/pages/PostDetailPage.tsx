@@ -5,6 +5,7 @@ import type { Post, Comment } from '../types'
 import CommentThread from '../components/shared/CommentThread'
 import Avatar from '../components/shared/Avatar'
 import useAuthStore from '../stores/authStore'
+import useInteractionStore from '../stores/interactionStore'
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -14,14 +15,13 @@ export default function PostDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
   const { token, user } = useAuthStore()
+  const { isLiked, isFavorited, setLiked, setFavorited, toggleLike, toggleFavorite } = useInteractionStore()
 
   const [post, setPost] = useState<Post | null>(null)
   const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
   const [commentInput, setCommentInput] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
-  const [liked, setLiked] = useState(false)
-  const [favorited, setFavorited] = useState(false)
   const [likesCount, setLikesCount] = useState(0)
   const [likeLoading, setLikeLoading] = useState(false)
   const [favoriteLoading, setFavoriteLoading] = useState(false)
@@ -29,14 +29,22 @@ export default function PostDetailPage() {
   useEffect(() => {
     if (!slug) return
     setLoading(true)
-    Promise.all([api.get<Post>(`/posts/${slug}`), api.get<Comment[]>(`/posts/${slug}/comments`)])
-      .then(([pr, cr]) => {
-        setPost(pr.data); setLikesCount(pr.data.likes_count ?? 0)
+    Promise.all([
+      api.get<Post>(`/posts/${slug}`),
+      api.get<Comment[]>(`/posts/${slug}/comments`),
+      token ? api.get<{ liked: boolean; favorited: boolean }>(`/posts/${slug}/status`) : Promise.resolve({ data: { liked: false, favorited: false } })
+    ])
+      .then(([pr, cr, sr]) => {
+        setPost(pr.data)
+        setLikesCount(pr.data.likes_count ?? 0)
         setComments(Array.isArray(cr.data) ? cr.data : [])
+        // Mettre à jour le store global avec les statuts réels
+        setLiked(pr.data.id, sr.data.liked)
+        setFavorited(pr.data.id, sr.data.favorited)
       })
       .catch(() => navigate('/'))
       .finally(() => setLoading(false))
-  }, [slug, navigate])
+  }, [slug, navigate, token])
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,21 +73,39 @@ export default function PostDetailPage() {
   const handleLike = async () => {
     if (!token) { navigate(`/login?from=/posts/${slug}`); return }
     if (!post || likeLoading) return
+    
     setLikeLoading(true)
-    const was = liked; setLiked(!was); setLikesCount(c => was ? c - 1 : c + 1)
-    try { was ? await api.delete(`/posts/${post.id}/like`) : await api.post(`/posts/${post.id}/like`) }
-    catch { setLiked(was); setLikesCount(c => was ? c + 1 : c - 1) }
-    finally { setLikeLoading(false) }
+    const wasLiked = isLiked(post.id)
+    const newLikedState = toggleLike(post.id)
+    setLikesCount(c => newLikedState ? c + 1 : c - 1)
+    
+    try { 
+      wasLiked ? await api.delete(`/posts/${post.id}/like`) : await api.post(`/posts/${post.id}/like`) 
+    } catch { 
+      // Revert sur erreur
+      toggleLike(post.id)
+      setLikesCount(c => wasLiked ? c + 1 : c - 1)
+    } finally { 
+      setLikeLoading(false) 
+    }
   }
 
   const handleFavorite = async () => {
     if (!token) { navigate(`/login?from=/posts/${slug}`); return }
     if (!post || favoriteLoading) return
+    
     setFavoriteLoading(true)
-    const was = favorited; setFavorited(!was)
-    try { was ? await api.delete(`/posts/${post.id}/favorite`) : await api.post(`/posts/${post.id}/favorite`) }
-    catch { setFavorited(was) }
-    finally { setFavoriteLoading(false) }
+    const wasFavorited = isFavorited(post.id)
+    toggleFavorite(post.id)
+    
+    try { 
+      wasFavorited ? await api.delete(`/posts/${post.id}/favorite`) : await api.post(`/posts/${post.id}/favorite`) 
+    } catch { 
+      // Revert sur erreur
+      toggleFavorite(post.id)
+    } finally { 
+      setFavoriteLoading(false) 
+    }
   }
 
   if (loading) return (
@@ -145,13 +171,13 @@ export default function PostDetailPage() {
           <div className="flex items-center gap-2 ml-auto">
             <button onClick={handleLike} disabled={likeLoading}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all disabled:opacity-50"
-              style={{ backgroundColor: liked ? 'rgba(224,82,82,0.15)' : 'rgba(255,255,255,0.06)', color: liked ? 'var(--danger)' : 'var(--text-secondary)', border: `1px solid ${liked ? 'rgba(224,82,82,0.4)' : 'var(--border)'}` }}>
-              {liked ? '❤️' : '🤍'} {likesCount}
+              style={{ backgroundColor: (post && isLiked(post.id)) ? 'rgba(224,82,82,0.15)' : 'rgba(255,255,255,0.06)', color: (post && isLiked(post.id)) ? 'var(--danger)' : 'var(--text-secondary)', border: `1px solid ${(post && isLiked(post.id)) ? 'rgba(224,82,82,0.4)' : 'var(--border)'}` }}>
+              {(post && isLiked(post.id)) ? '❤️' : '🤍'} {likesCount}
             </button>
             <button onClick={handleFavorite} disabled={favoriteLoading}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all disabled:opacity-50"
-              style={{ backgroundColor: favorited ? 'rgba(18,118,158,0.15)' : 'rgba(255,255,255,0.06)', color: favorited ? 'var(--accent-light)' : 'var(--text-secondary)', border: `1px solid ${favorited ? 'var(--accent)' : 'var(--border)'}` }}>
-              {favorited ? '🔖' : '📑'}
+              style={{ backgroundColor: (post && isFavorited(post.id)) ? 'rgba(18,118,158,0.15)' : 'rgba(255,255,255,0.06)', color: (post && isFavorited(post.id)) ? 'var(--accent-light)' : 'var(--text-secondary)', border: `1px solid ${(post && isFavorited(post.id)) ? 'var(--accent)' : 'var(--border)'}` }}>
+              {(post && isFavorited(post.id)) ? '🔖' : '📑'}
             </button>
           </div>
         </div>
